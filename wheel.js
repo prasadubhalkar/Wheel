@@ -7,18 +7,22 @@ var data = [];
  * and start binding events
  * @returns {undefined}
  */
-$(document).ready(function (argument) {
+$(document).ready( function( (argument) {
 	/**
 	 * Listen to click event for spin and trigger
 	 * wheel spinning
 	 * @returns {undefined}
 	 */
-	$("#startspin").click(function(){
+	$("#startspin").click( function() {
 		resetWheel();
+
 		checkErrorMessage();
-		setTimeout(function(){
-			spin();
-		}, 500);
+
+		if(groups.length > 1) {
+			setTimeout( function() {
+				spin();
+			}, 500);	
+		}
 	});
 
 	/**
@@ -26,16 +30,13 @@ $(document).ready(function (argument) {
 	 * graph data accordingly
 	 * @returns {undefined}
 	 */
-	$("input[type='checkbox']").click(function(e){
+	$("input[type='checkbox']").click( function(e) {
 		var $target = $(e.target);
 		var $value = $target.val();
+
 		resetWheel();
-		if($target.is(':checked')) {
-			addCandidate($value);
-		}
-		else {
-			removeCandidate($value);	
-		}
+
+		$target.is(':checked') ? addCandidate($value) : removeCandidate($value);
 	});
 
 	/**
@@ -66,13 +67,15 @@ $(document).ready(function (argument) {
 	 * @param  {string} $value
 	 * @returns {undefined}
 	 */
-	function removeCandidate($value){
+	function removeCandidate($value) {
 		groups.splice(groups.indexOf($value), 1);
-		data.forEach(function(element, index){
-			if(element[0] === $value){
+
+		data.forEach( function(element, index) {
+			if(element[0] === $value) {
 				data.splice(index, 1);
 			}
 		});
+
 		wheel.unload({
 	        ids: $value
 	    });
@@ -84,10 +87,13 @@ $(document).ready(function (argument) {
 	 * @param {string} $value
 	 * @returns {undefined}
 	 */
-	function addCandidate($value){
+	function addCandidate($value) {
 		groups.push($value);
+		
 		checkErrorMessage();
+		
 		data.push([$value, 1]);
+		
 		wheel.load({
 			columns: data
 		});	
@@ -98,8 +104,9 @@ $(document).ready(function (argument) {
 	 * selection
 	 * @returns {undefined}
 	 */
-	function resetWheel(){
+	function resetWheel() {
 		var parent = $(".c3-chart-arcs");
+		
 		$('path', parent).d3MouseOut();
 	}
 
@@ -108,13 +115,9 @@ $(document).ready(function (argument) {
 	 * message to the user
 	 * @returns {undefined}
 	 */
-	function checkErrorMessage(){
-		if(groups.length > 1) {
-			$("#message").html("");
-		}
-		else {
-			$("#message").html("Please select atleast couple of fortunate people");
-		}
+	function checkErrorMessage() {
+		var message = (groups.length > 1) ? "" : "Please select atleast couple of fortunate people";
+		$("#message").html(message);
 	}
 
 	/**
@@ -122,16 +125,16 @@ $(document).ready(function (argument) {
 	 * process of the wheel
 	 * @returns {object} handler for interval
 	 */
-	function startSpinning(){
+	function startSpinning() {
 		var i = 0;
 		var parent = $(".c3-chart-arcs");
 		var classId = ".c3-arcs-";
 
-		return setInterval(function(){
+		return setInterval( function() {
 			$(classId + groups[i] + " > path", parent).d3MouseOver();
-			if(i > groups.length -1){
+			if(i > groups.length -1) {
 				i = 1;
-				$(classId + groups[i - 1] + " > path", parent).d3MouseOver();
+				$(classId + groups[0] + " > path", parent).d3MouseOver();
 			}
 			else{
 				i = i + 1;	
@@ -143,15 +146,13 @@ $(document).ready(function (argument) {
 	 * spin will initiate the wheel spinning
 	 * @returns {undefined}
 	 */
-	function spin(){
-		var number = Math.floor(Math.random() * 5000) + 1;
-		
-		resetWheel();
+	function spin() {
+		var spinInterval = Math.floor(Math.random() * 5000) + 1;
 
 		var spinnerEvent = startSpinning();
 
-		setTimeout(function(){
+		setTimeout( function() {
 			clearInterval(spinnerEvent);
-		}, number);
+		}, spinInterval);
 	}
 });
